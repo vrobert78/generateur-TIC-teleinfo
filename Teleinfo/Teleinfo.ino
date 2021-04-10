@@ -27,10 +27,11 @@ const char TAB = '\t'; //Space used as "Field Separator" flag in standard mode (
 
 boolean groupStringComplete = false; //flag to indicate that a group has been fully retrieved
 String groupString; // buffer to store a group
-long eait = 0; // global variable in which the cumulative produced energy will be stored
+
 String papp = "0";
+String iinst = "0";
 String ptec = "HP.. ";
-const unsigned long offset = 18769000; // value of the previous ENEDIS electric production counter
+
 String nextFrame;
 String currentFrame;
 
@@ -145,7 +146,12 @@ void processGroup() {
     } else {
       if (groupString.indexOf("PTEC") == 0) {      
         ptec = groupString.substring(5,10);  
+      } else {
+        if (groupString.indexOf("IINST") == 0) {      
+          iinst = groupString.substring(6,10).toInt();  
+        }
       }
+      
     }
   }  
 }
@@ -159,6 +165,7 @@ void processGroup() {
 void makeFrame(){
   String group = "";
   String basePAPP = "00000";
+  String baseIINST = "000";
   
   nextFrame = STX;
   
@@ -203,8 +210,13 @@ void makeFrame(){
   group += CR;
   nextFrame += group ;
 
+  baseIINST += iinst;
+  baseIINST = baseIINST.substring(baseIINST.length()-3);
+
   group = LF;
-  group += "IINST 001 ";
+  group += "IINST ";
+  group += baseIINST;
+  group += " ";
   group += (char)checkSum(group);
   group += CR;
   nextFrame += group ;
