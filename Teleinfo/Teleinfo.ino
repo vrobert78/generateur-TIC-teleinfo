@@ -32,6 +32,7 @@ String papp = "0";
 String iinst = "0";
 String ptec = "HP.. ";
 String isousc = "45";
+String adps = "0";
 
 String nextFrame;
 String currentFrame;
@@ -156,6 +157,9 @@ void processGroup() {
     else if (groupString.indexOf("ISOUSC") == 0) {
       isousc = groupString.substring(7,10).toInt();
     }
+    else if (groupString.indexOf("ADPS") == 0) {
+      adps = groupString.substring(5,9).toInt();
+    }
   }  
 }
 
@@ -167,9 +171,10 @@ void processGroup() {
  */
 void makeFrame(){
   String group = "";
-  String basePAPP = "00000";
-  String baseIINST = "000";
-  String baseISOUSC = "00";
+  String PAPP = "00000";
+  String IINST = "000";
+  String ISOUSC = "00";
+  String ADPS = "000";
   
   nextFrame = STX;
   
@@ -185,12 +190,12 @@ void makeFrame(){
   group += CR;
   nextFrame += group ;
 
-  baseISOUSC += isousc;
-  baseISOUSC = baseISOUSC.substring(baseISOUSC.length()-2);
+  ISOUSC += isousc;
+  ISOUSC = ISOUSC.substring(ISOUSC.length()-2);
 
   group = LF;
   group += "ISOUSC ";
-  group += baseISOUSC;
+  group += ISOUSC;
   group += " ";
   group += (char)checkSum(group);
   group += CR;
@@ -219,12 +224,25 @@ void makeFrame(){
   group += CR;
   nextFrame += group ;
 
-  baseIINST += iinst;
-  baseIINST = baseIINST.substring(baseIINST.length()-3);
+  if (adps!="0") {
+    ADPS += adps;
+    ADPS = ADPS.substring(ADPS.length()-3);
+
+    group = LF;
+    group += "ADPS ";
+    group += ADPS;
+    group += " ";
+    group += (char)checkSum(group);
+    group += CR;
+    nextFrame += group ;
+  }
+
+  IINST += iinst;
+  IINST = IINST.substring(IINST.length()-3);
 
   group = LF;
   group += "IINST ";
-  group += baseIINST;
+  group += IINST;
   group += " ";
   group += (char)checkSum(group);
   group += CR;
@@ -236,12 +254,12 @@ void makeFrame(){
   group += CR;
   nextFrame += group ;
 
-  basePAPP += papp;
-  basePAPP = basePAPP.substring(basePAPP.length()-5);
+  PAPP += papp;
+  PAPP = PAPP.substring(PAPP.length()-5);
 
   group = LF;
   group += "PAPP ";
-  group += basePAPP;
+  group += PAPP;
   group += " ";
   group += (char)checkSum(group);
   group += CR;
