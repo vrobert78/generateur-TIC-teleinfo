@@ -31,6 +31,7 @@ String groupString; // buffer to store a group
 String papp = "0";
 String iinst = "0";
 String ptec = "HP.. ";
+String isousc = "45";
 
 String nextFrame;
 String currentFrame;
@@ -92,6 +93,8 @@ void loop() {
     groupString = "";
   } 
   makeFrame();
+
+  //Serial.println(nextFrame);
   sendFrame();
 }
 
@@ -143,15 +146,15 @@ void processGroup() {
     //valid checksum, the group is valid
     if (groupString.indexOf("PAPP") == 0) {      
       papp = groupString.substring(5,11).toInt();  
-    } else {
-      if (groupString.indexOf("PTEC") == 0) {      
-        ptec = groupString.substring(5,10);  
-      } else {
-        if (groupString.indexOf("IINST") == 0) {      
-          iinst = groupString.substring(6,10).toInt();  
-        }
-      }
-      
+    }
+    else if (groupString.indexOf("PTEC") == 0) {
+      ptec = groupString.substring(5,10);
+    }
+    else if (groupString.indexOf("IINST") == 0) {
+      iinst = groupString.substring(6,10).toInt();
+    }
+    else if (groupString.indexOf("ISOUSC") == 0) {
+      isousc = groupString.substring(7,10).toInt();
     }
   }  
 }
@@ -166,6 +169,7 @@ void makeFrame(){
   String group = "";
   String basePAPP = "00000";
   String baseIINST = "000";
+  String baseISOUSC = "00";
   
   nextFrame = STX;
   
@@ -181,8 +185,13 @@ void makeFrame(){
   group += CR;
   nextFrame += group ;
 
+  baseISOUSC += isousc;
+  baseISOUSC = baseISOUSC.substring(baseISOUSC.length()-2);
+
   group = LF;
-  group += "ISOUSC 45 ";
+  group += "ISOUSC ";
+  group += baseISOUSC;
+  group += " ";
   group += (char)checkSum(group);
   group += CR;
   nextFrame += group ;
